@@ -12,3 +12,4 @@
 2. 打开`data`导入sql文件，在修改config/db.json数据库配置信息。
 3. 执行`npm run serve` 启动项目
 4. 这是在github上面手动修改的，需要执行git pull 进行拉取
+5. again
