@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>layout 后台大布局 - Layui</title>
+  <link rel="stylesheet" href="/public/layui/css/layui.css">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  
+  
+   <!-- 引入左边侧边栏 -->
+   {{ include './common/header.html' }}
+  
+  <!-- 引入左边侧边栏 -->
+  {{ include './common/side.html' }}
+  
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+              <label class="layui-form-label">分类名称：</label>
+              <div class="layui-input-inline">
+                <input type="text" name="name" lay-verify="required" placeholder="分类名称" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序：</label>
+                <div class="layui-input-inline">
+                  <input type="number" name="sort"  required  lay-verify="number"  autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">添加时间：</label>
+                <div class="layui-input-inline">
+                  <input type="text"  id="add_date"  name="add_date" required  lay-verify="required"  autocomplete="off" class="layui-input">
+                </div>
+            </div>
+                        
+           
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">添加</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              </div>
+            </div>
+        </form>
+    </div>
+  </div>
+  
+    <!-- 引入左边侧边栏 -->
+    {{ include './common/footer.html' }}
+  
+</div>
+<script src=""></script>
+<script src="/public/layui/layui.js"></script>
+<script src="/public/js/jquery.js"></script>
+<script>
+//JavaScript代码区域
+layui.use(['element','form','layer','laydate'], function(){
+  var element = layui.element;
+  var layer = layui.layer;
+
+  var form = layui.form;
+  var laydate = layui.laydate
+  
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    // console.log(data);return false;
+    // 表单验证成功后触发这里，data.field是我们的表单数据 
+    // data.elem:是当前点击的提交按钮的dom对象
+    // 发送ajax请求，进行数据入库
+    let oldText = data.elem.innerText;
+    $(data.elem).addClass('layui-btn-disabled').text('添加中..')
+    $.ajax({
+      type:'post',
+      url:"/postCat",
+      data:data.field
+    }).then(res=>{
+      $(data.elem).removeClass('layui-btn-disabled').text(oldText)
+      let {errcode,message} = res;
+      if(errcode == 0){
+        layer.msg(message)
+        location.href="/catindex";
+      }else{
+        layer.msg(message)
+      }
+    })
+    return false; // 阻止表单默认提交的行为
+  });
+
+   // 初始化时间
+  //常规用法
+  laydate.render({
+    elem: '#add_date',
+    type: "datetime"
+  });
+
+  
+
+});
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
