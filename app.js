@@ -18,7 +18,7 @@ app.use('/public',express.static(path.join(__dirname,'public')));
 const artTemplate = require('art-template'); 
 const express_template = require('express-art-template');
 
-//配置模板的路径
+//配置模板的路径111111
 app.set('views', __dirname + '/views/');
 
 //设置express_template模板引擎的静态文件扩展名为.html
