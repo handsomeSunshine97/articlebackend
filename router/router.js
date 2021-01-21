@@ -6,6 +6,7 @@ let router = express.Router();
 
 // 导入相应的控制器
 const CateController = require('../controller/CateController.js');
+const ArtController = require('../controller/ArtController.js');
 
 // 匹配 / 或 /admin
 router.get(/^\/$|^\/admin$/,(req,res)=>{
@@ -48,6 +49,9 @@ router.post('/delCat',CateController.delCat)
 
 // 编辑分类的接口
 router.post('/updCate',CateController.updCate)
+
+// 获取文章数据接口
+router.get('/allarticle',ArtController.allArticle)
 
 // 匹配失败的路由
 router.all('*',(req,res)=>{

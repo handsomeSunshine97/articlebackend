@@ -22,38 +22,15 @@
    
     <div style="padding: 15px;">
         <h2>文章管理</h2>
-        <table class="layui-table" lay-size="sm">
-            <colgroup>
-              <col width="150">
-              <col width="200">
-              <col>
-            </colgroup>
-            <thead>
-              <tr>
-                <th>昵称</th>
-                <th>加入时间</th>
-                <th>签名</th>
-              </tr> 
-            </thead>
-            <tbody>
-              <tr>
-                <td>贤心</td>
-                <td>2016-11-29</td>
-                <td>人生就像是一场修行</td>
-              </tr>
-              <tr>
-                <td>许闲心</td>
-                <td>2016-11-28</td>
-                <td>于千万人之中遇见你所遇见的人，于千万年之中，时间的无涯的荒野里…</td>
-              </tr>
-              <tr>
-                <td>sentsin</td>
-                <td>2016-11-27</td>
-                <td> Life is either a daring adventure or nothing.</td>
-              </tr>
-            </tbody>
-          </table>
+        <table class="layui-hide" id="test" lay-filter="test"></table>
     </div>
+
+    <script type="text/html" id="barDemo">
+      <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+      <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+    
   </div>
   
    <!-- 引入左边侧边栏 -->
@@ -63,9 +40,45 @@
 <script src="/public/layui/layui.js"></script>
 <script>
 //JavaScript代码区域
-layui.use('element', function(){
+layui.use(['element','table'], function(){
   var element = layui.element;
+  var table = layui.table;
   
+  table.render({
+    elem: '#test'
+    ,url:'/allarticle'
+    ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+    ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+      title: '提示'
+      ,layEvent: 'LAYTABLE_TIPS'
+      ,icon: 'layui-icon-tips'
+    }]
+    ,title: '文章数据'
+    ,cols: [[
+      {type: 'checkbox', fixed: 'left'}
+      ,{field:'art_id', title:'ID', width:80, fixed: 'left', unresize: true}
+      ,{field:'title', title:'标题', width:120, edit: 'text'}
+      ,{field:'content', title:'内容', width:120}
+      ,{field:'cat_id', title:'所属分类', width:150}
+      ,{field:'author', title:'作者', width:80, edit: 'text', sort: true}
+      ,{field:'cover', title:'图片', width:100}
+      ,{field:'status', title:'状态',unresize: false,templet:(item)=>{
+
+        console.log(status);  // 0- 1 2
+        let statusMap = {
+          "0": "未发布",
+          "1":"已发布",
+          "2":"审核中"
+        }
+        return statusMap[item.status]
+      }}
+      ,{field:'publish_date', title:'发布时间', width:80, sort: true}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+    ]]
+    ,page: true
+  });
+  
+
 });
 </script>
 </body>
