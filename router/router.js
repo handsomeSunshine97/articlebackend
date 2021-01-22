@@ -53,6 +53,10 @@ router.post('/updCate',CateController.updCate)
 // 获取文章数据接口
 router.get('/allarticle',ArtController.allArticle)
 
+
+// 删除文章
+router.post('/delArticle',ArtController.delArticle)
+
 // 匹配失败的路由
 router.all('*',(req,res)=>{
     res.json({errcode:10004,message:"请求错误"})

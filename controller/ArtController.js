@@ -7,6 +7,11 @@ let articleData = require("../mockData/article.json");
 // 导入model,相当于模型执行sql语句，
 const model = require('../model/model.js');
 
+// 导入返回结果的信息
+const {delsucc,delfail,exception,argsfail,addsucc,addfail,getsucc,getfail,updsucc,updfail} 
+= require('../util/responseMessage.js');
+
+// 获取分页的文章数据
 ArticleController.allArticle = async (req,res)=>{
     //1. 接收查询字符串,给limit取别名
     let {page,limit:pagesize} = req.query;
@@ -31,6 +36,20 @@ ArticleController.allArticle = async (req,res)=>{
     // res.json(articleData)
 }
 
+
+
+//删除文章
+ArticleController.delArticle = async (req,res)=>{
+    let {art_id} = req.body;
+    console.log(art_id)
+    let sql = `delete from article where art_id = ${art_id}`;
+    let result = await model(sql);
+    if(result.affectedRows){
+        res.json(delsucc)
+    }else{
+        res.json(delfail)
+    }
+}
 
 // 暴露模块
 module.exports = ArticleController;

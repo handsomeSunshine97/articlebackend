@@ -22,7 +22,7 @@ const express_template = require('express-art-template');
 app.set('views', __dirname + '/views/');
 
 //设置express_template模板引擎的静态文件扩展名为.html
-app.engine('html', express_template); 
+app.engine('html', express_template);
 
 //使用模板引擎扩展名为html
 app.set('view engine', 'html');
