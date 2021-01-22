@@ -3,6 +3,10 @@ let express = require('express');
 // 得到一个路由器
 let router = express.Router();
 
+const multer = require('multer');
+// 定义上传的目录
+let upload = multer({ dest: 'uploads/' })
+
 
 // 导入相应的控制器
 const CateController = require('../controller/CateController.js');
@@ -66,6 +70,9 @@ router.get('/artedit',ArtController.artEdit)
 
 // 提交文章的数据入库
 router.post('/postArt',ArtController.postArt)
+
+// 上传文件
+router.post('/upload',upload.single('file'),ArtController.upload)
 
 // 匹配失败的路由
 router.all('*',(req,res)=>{

@@ -20,6 +20,7 @@
     <div style="padding: 15px;">
         <h2 style="text-align: center; margin: 5px;">文章添加</h2>
         <form class="layui-form" action="" lay-filter="formDemo">
+            <input type="hidden" name='cover' id="cover" value=''>
             <div class="layui-form-item">
               <label class="layui-form-label">标题</label>
               <div class="layui-input-inline">
@@ -37,6 +38,13 @@
                       </button>
                   </div>
               </div>
+
+              <div class="layui-form-item">
+                <label class="layui-form-label">预览</label>
+                <div class="layui-input-block">
+                   <img src="" id="preview" alt="">
+                </div>
+            </div>
 
  
             <div class="layui-form-item">
@@ -84,9 +92,10 @@
 {{ include './common/scriptjs.html' }}
 <script>
 //JavaScript代码区域
-layui.use(['element','form','layer'], function(){
+layui.use(['element','form','layer','upload'], function(){
   var element = layui.element;
   var layer = layui.layer;
+  var upload = layui.upload;
 
   var form = layui.form;
   
@@ -110,7 +119,6 @@ layui.use(['element','form','layer'], function(){
       
       let optionStr = `<option value=""></option>`;
       res.forEach(v=>{
-        console.log(v)
         optionStr += `<option value="${v.cat_id}">${v.name}</option>`
       })
       // 赋值给下拉框select
@@ -122,6 +130,23 @@ layui.use(['element','form','layer'], function(){
     },'json')
   }
   loadCate();
+
+
+  //执行实例
+  var uploadInst = upload.render({
+    elem: '#test1' //绑定元素
+    ,url: '/upload/' //上传接口
+    ,done: function({code,message,data:{src}}){
+      //上传完毕回调
+      if(code == 0){
+        console.log(src)
+        $('#preview').attr('src',src).css('width','150')
+        $("#cover").val(src)
+      }
+      layer.msg(message)
+      
+    }
+  });
 
   // 给表单赋值
   // form.val('formDemo',{

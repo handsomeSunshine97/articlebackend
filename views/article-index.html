@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   {{ include './common/linkcss.html' }}
+  <link rel="stylesheet" href="/public/css/lightbox.css">
 </head>
 
 <body class="layui-layout-body">
@@ -46,17 +47,8 @@
 
   </div>
   {{ include './common/scriptjs.html' }}
+  <script src="/public/js/lightbox-plus-jquery.min.js"></script>
   <script>
-    // NProgress.set(0.4);// 默认设置40% NProgress.set(0) 等价与 NProgress.start()
-    // let interval = setInterval(function(){
-    //     NProgress.inc(); // 以小量递增
-    // },200)
-
-    // $(window).on('load',()=>{
-    //     clearInterval(interval)
-    //     NProgress.done()
-    // })
-
     //JavaScript代码区域
     layui.use(['element', 'table'], function () {
       var element = layui.element;
@@ -107,7 +99,7 @@
             title: '内容',
             width: 120
           }, {
-            field: 'cat_id',
+            field: 'name',
             title: '所属分类',
             width: 150
           }, {
@@ -119,16 +111,23 @@
           }, {
             field: 'cover',
             title: '图片',
-            width: 100
+            width: 100,
+            templet({cover}){
+              
+              let str = ` <a class="example-image-link" href="${cover}" data-lightbox="example-1" data-title="我帅木">
+                          <img class="example-image" src="${cover}" alt="image-1" />
+                      </a>`
+              return str;
+            }
           }, {
             field: 'status',
             title: '状态',
-            unresize: false,
+            width: 100,
             templet: (item) => {
               // 映射关系 或 new Map也行
               let statusMap = {
-                "0": "未发布",
-                "1": "已发布",
+                "0": "<span class='layui-badge layui-bg-orange'>未发布</span>",
+                "1": "<span class='layui-badge layui-bg-green'>已发布</span>",
                 "2": "审核中"
               }
               return statusMap[item.status]
@@ -146,7 +145,23 @@
           }, {
             fixed: 'right',
             title: '操作',
-            toolbar: '#barDemo'
+            // toolbar: '#barDemo',
+            templet({status}){
+              let str = `<a class="layui-btn layui-btn-xs" style='background:#01AAED;' lay-event="show">查看内容</a>`;
+                switch(status){
+                  case 0: // 询问是否审核通过
+                    str += `<a class="layui-btn layui-btn-xs" style='background:#FFB800;' lay-event="show">待审核</a>`
+                    break;
+                  case 1:
+                    str += `<a class="layui-btn layui-btn-xs" style='background:green;' lay-event="show">审核成功</a>`
+                    break;
+                  default:
+                    break;
+                }
+              str += `<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                      <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>`;
+              return str;
+            }
           }]
         ],
         page: true,

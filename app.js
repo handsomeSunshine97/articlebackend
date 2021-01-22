@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 
 // 定义中间件，托管静态资源
 app.use('/public',express.static(path.join(__dirname,'public')));
+app.use('/uploads',express.static(path.join(__dirname,'uploads')));
 
 const artTemplate = require('art-template'); 
 const express_template = require('express-art-template');
