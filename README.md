@@ -37,3 +37,7 @@
 > 高版本的jquery不支持 ` $(window).on('load')`的写法，改为on绑定即可. [参考](https://www.jianshu.com/p/d1269761bd0a)
 
 
+## 文章编辑
+
+- 1.先实现数据在表单中的回显，要获取到文章的id去发起请求获取数据
+- 2.实现update入库 

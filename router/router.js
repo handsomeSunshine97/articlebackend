@@ -57,6 +57,16 @@ router.get('/allarticle',ArtController.allArticle)
 // 删除文章
 router.post('/delArticle',ArtController.delArticle)
 
+// 渲染出添加文章的页面
+router.get('/addart',ArtController.artAdd)
+
+// 渲染出编辑文章的页面
+router.get('/artedit',ArtController.artEdit)
+
+
+// 提交文章的数据入库
+router.post('/postArt',ArtController.postArt)
+
 // 匹配失败的路由
 router.all('*',(req,res)=>{
     res.json({errcode:10004,message:"请求错误"})

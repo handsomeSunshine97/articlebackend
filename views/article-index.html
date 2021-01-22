@@ -23,6 +23,12 @@
 
       <div style="padding: 15px;">
         <h2>文章管理</h2>
+        <div>
+            <button type="button" id="add"  class="layui-btn">
+                <i class="layui-icon">&#xe608;</i> 添加文章
+            </button>
+        </div>
+       
         <table class="layui-hide" id="test" lay-filter="test"></table>
       </div>
 
@@ -167,13 +173,10 @@
         let {art_id} = data;
         switch (event) {
           case "del":
-            // del 
-            console.log('del', data.art_id)
             del(art_id)
             break;
           case "edit":
-            // del 
-            console.log('edit', data.art_id)
+            edit(art_id)
             break;
 
         }
@@ -205,7 +208,16 @@
             });
       }
 
+      // 跳转到文章编辑页面
+      function edit(art_id){
+        // 需要把id携带过去
+        location.href = `/artedit?art_id=${art_id}`
+      }
 
+      // 跳转到文章添加页面
+      $("#add").on('click',()=>{
+        location.href = '/addart'
+      })
 
     });
   </script>
