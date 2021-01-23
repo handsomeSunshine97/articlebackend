@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  {{ include './common/linkcss.html' }}
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  
+  
+   <!-- 引入左边侧边栏 -->
+   {{ include './common/header.html' }}
+  
+  <!-- 引入左边侧边栏 -->
+  {{ include './common/side.html' }}
+  
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px;">
+        <h2 style="text-align: center; margin: 5px;">文章编辑</h2>
+        <form class="layui-form" action="" lay-filter="formDemo">
+          <!-- 设置隐藏域，保存文件路径，便于提交到后台 -->
+          <input type="hidden" name="cover">
+            <div class="layui-form-item">
+              <label class="layui-form-label">标题</label>
+              <div class="layui-input-inline">
+                <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+
+
+            
+              <div class="layui-form-item">
+                  <label class="layui-form-label">文章封面</label>
+                  <div class="layui-input-block">
+                      <button type="button" class="layui-btn" id="cover_img_upload">
+                          <i class="layui-icon">&#xe67c;</i>上传图片
+                      </button>
+                  </div>
+              </div>
+
+              <div class="layui-form-item">
+                <label class="layui-form-label">预览</label>
+                <div class="layui-input-block">
+                    <img src="" alt="" id='cover-preview'>
+                </div>
+            </div>
+
+              <div style="position: relative;">
+                  <div class="layui-form-item" style="position: absolute;top:0;left:0;z-index:99999;">
+                      <label class="layui-form-label">所属分类</label>
+                      <div class="layui-input-inline">
+                        <select id="cat_id" name="cat_id" lay-verify="required">
+                          <option value=""></option>
+                          <option value="0">军事</option>
+                          <option value="1">娱乐</option>
+                          <option value="2">体育</option>
+                        </select>
+                      </div>
+                    </div>
+              </div>
+              
+          
+
+          
+            <div class="layui-form-item" style="margin: 50px 0;">
+              <label class="layui-form-label">状态</label>
+              <div class="layui-input-block">
+                <input type="radio" name="status" value="0" title="未发布" checked>
+                <input type="radio" name="status" value="1" title="发布" >
+              </div>
+            </div>
+
+            
+            <div class="layui-form-item layui-form-text">
+              <label class="layui-form-label">内容</label>
+              <div class="layui-input-block">
+                <!-- <textarea name="content" placeholder="请输入内容" class="layui-textarea"></textarea> -->
+                <div id="content"></div>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">添加</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              </div>
+            </div>
+        </form>
+    </div>
+  </div>
+  
+    <!-- 引入左边侧边栏 -->
+    {{ include './common/footer.html' }}
+  
+</div>
+{{ include './common/scriptjs.html' }}
+<script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
+<script>
+  // 
+  // 获取地址栏中的art_id的参数
+  let url = location.href;
+  let reg = /art_id=(.*)&?/;
+  // [...伪数组] =》 转化为真数组
+  // [,cat_id]： 解构：舍去第一个参数，要第二个参数
+  let [,art_id] = [...reg.exec(url)]
+
+  const E = window.wangEditor
+  const editor = new E('#content')
+  editor.config.uploadImgShowBase64 = true; // 可以实现手动上传图片(转换成base64格式)
+  editor.create()
+  
+  //JavaScript代码区域  
+  layui.use(['element','form','layer','upload'], function(){
+  var element = layui.element;
+  var layer = layui.layer;
+
+  var form = layui.form;
+  var upload = layui.upload;
+   
+  //执行实例
+  var uploadInst = upload.render({
+    elem: '#cover_img_upload' //绑定元素
+    ,url: '/upload/' //上传接口
+    ,done: function({code,message,src}){
+      //上传完毕回调
+      if(code == 0){
+        // 1.图片预览 2.把图片路径设置到表单隐藏域提交到后台
+        $('#cover-preview').attr('src',src).css('width','100')
+        $("input[name='cover']").val(src)
+      }
+    }
+    ,error: function(){
+      //请求异常回调
+    }
+  });
+  
+ 
+
+  //监听提交
+  // lay-filter="formDemo"
+  form.on('submit(formDemo)', function(data){
+    let formData = data.field;
+    formData.content = editor.txt.html(); //获取编辑器内容
+    // 发送ajax请求，入库数据即可
+    $.post('/postArt',formData,({errcode,message})=>{
+      if(errcode == 0){
+        location.href = '/artindex';
+      }
+      layer.msg(message)
+    },'json')
+    return false;
+  });
+
+  //加载所有的分类
+  function loadCate(){
+    $.get('/getCate',(res)=>{
+      
+      let optionStr = `<option value=""></option>`;
+      res.forEach(v=>{
+        optionStr += `<option value="${v.cat_id}">${v.name}</option>`
+      })
+      // 赋值给下拉框select
+      // optionStr是属于ajax动态生成的
+      $("#cat_id").html(optionStr);
+      form.render(); // 重新渲染
+      // 等待分类加载成功之后，在获取当前文章的数据（要保证顺序）
+      getEditArt();
+   
+    },'json')
+  }
+  loadCate();
+
+  // 1在获取当前文章的数据
+  function getEditArt(){
+    // 发送ajax获取当前文章的数据,进行数据的表单回显
+    $.get('/getOneArt',{art_id},(res)=>{
+      console.log(res)
+        let {title,content,status,cover,cat_id} = res;
+        cover && $('#cover-preview').attr('src',cover)
+        editor.txt.html(content)
+        // 给表单赋值
+        form.val('formDemo',{
+          title,
+          status,
+          cat_id
+        })
+    },'json')
+  }
+
+
+  
+});
+</script>
+</body>
+</html>
