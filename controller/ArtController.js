@@ -12,14 +12,18 @@ const model = require('../model/model.js');
 const {delsucc,delfail,exception,argsfail,addsucc,addfail,getsucc,getfail,updsucc,updfail} 
 = require('../util/responseMessage.js');
 
+
+
+
 // 获取分页的文章数据
 ArticleController.allArticle = async (req,res)=>{
     //1. 接收查询字符串,给limit取别名
     let {page,limit:pagesize} = req.query;
     //2.编写sql语句
     let offset = (page - 1)*pagesize;
-    let sql = `select t1.*,t2.name from article t1 left join category t2 on t1.cat_id = t2.cat_id 
-                order by art_id desc limit ${offset},${pagesize} `;
+    let sql = `select t1.*,t2.name from article t1 left join category t2 on t1.cat_id = t2.cat_id
+    
+                order by t1.art_id desc limit ${offset},${pagesize} `;
     let sql2 = `select count(*) as count from article;`
     let promise1 =  model(sql); // [{},{},{}]
     let promise2 =  model(sql2); // [{count:16}]
@@ -65,8 +69,8 @@ ArticleController.artAdd = (req,res)=>{
 // 提交数据入库
 ArticleController.postArt = async (req,res)=>{
     let {title,cat_id,status,content,cover} = req.body;
-    let sql = `insert into article(title,content,cat_id,status,cover,publish_date)
-                values('${title}','${content}',${cat_id},${status},'${cover}',now())
+    let sql = `insert into article(title,content,author,cat_id,status,cover,publish_date)
+                values('${title}','${content}','admin',${cat_id},${status},'${cover}',now())
                 `;
     let result = await model(sql)
     if(result.affectedRows){
@@ -77,9 +81,9 @@ ArticleController.postArt = async (req,res)=>{
 
 }
 
-// 上传图片的接口
+//实现文件上传
 ArticleController.upload = (req,res)=>{
-   
+    console.log(req.file); //接收文件上传成功后的信息
     if(req.file){
         // 进行文件的重命名即可 fs.rename
         let {originalname,destination,filename} = req.file;
@@ -89,25 +93,13 @@ ArticleController.upload = (req,res)=>{
         let newPath = `${destination}${filename}${ext}`;
         fs.rename(oldPath,newPath,err=>{
             if(err){ throw err; }
-            res.json({code:0,message:'上传文件成功',src:newPath})
+            res.json({message:'上传成功',code: 0,data:{src:newPath}})
         })
     }else{
-        res.json({code:1, message:'上传文件失败'})
+        res.json({message:'上传失败',code: 1,data:null})
     }
-    
 }
 
-// 修改文章的状态
-ArticleController.updStatus = async (req,res)=>{
-    let {art_id,status} = req.body;
-    let sql = `update article set status = ${status} where art_id = ${art_id}`;
-    let result = await model(sql);
-    if(result.affectedRows){
-        res.json(updsucc)
-    }else{
-        res.json(updfail)
-    }
-}
 
 // 暴露模块
 module.exports = ArticleController;
