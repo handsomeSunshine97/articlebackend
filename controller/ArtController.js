@@ -17,7 +17,8 @@ ArticleController.allArticle = async (req,res)=>{
     let {page,limit:pagesize} = req.query;
     //2.编写sql语句
     let offset = (page - 1)*pagesize;
-    let sql = `select * from article order by art_id desc limit ${offset},${pagesize} `;
+    let sql = `select t1.*,t2.name from article t1 left join category t2 on t1.cat_id = t2.cat_id 
+                order by art_id desc limit ${offset},${pagesize} `;
     let sql2 = `select count(*) as count from article;`
     let promise1 =  model(sql); // [{},{},{}]
     let promise2 =  model(sql2); // [{count:16}]
