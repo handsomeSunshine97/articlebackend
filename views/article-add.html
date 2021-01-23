@@ -20,6 +20,8 @@
     <div style="padding: 15px;">
         <h2 style="text-align: center; margin: 5px;">文章添加</h2>
         <form class="layui-form" action="" lay-filter="formDemo">
+          <!-- 设置隐藏域，保存文件路径，便于提交到后台 -->
+          <input type="hidden" name="cover">
             <div class="layui-form-item">
               <label class="layui-form-label">标题</label>
               <div class="layui-input-inline">
@@ -32,11 +34,18 @@
               <div class="layui-form-item">
                   <label class="layui-form-label">文章封面</label>
                   <div class="layui-input-block">
-                      <button type="button" class="layui-btn" id="test1">
+                      <button type="button" class="layui-btn" id="cover_img_upload">
                           <i class="layui-icon">&#xe67c;</i>上传图片
                       </button>
                   </div>
               </div>
+
+              <div class="layui-form-item">
+                <label class="layui-form-label">预览</label>
+                <div class="layui-input-block">
+                    <img src="" alt="" id='cover-preview'>
+                </div>
+            </div>
 
  
             <div class="layui-form-item">
@@ -84,11 +93,29 @@
 {{ include './common/scriptjs.html' }}
 <script>
 //JavaScript代码区域
-layui.use(['element','form','layer'], function(){
+layui.use(['element','form','layer','upload'], function(){
   var element = layui.element;
   var layer = layui.layer;
 
   var form = layui.form;
+  var upload = layui.upload;
+   
+  //执行实例
+  var uploadInst = upload.render({
+    elem: '#cover_img_upload' //绑定元素
+    ,url: '/upload/' //上传接口
+    ,done: function({code,message,src}){
+      //上传完毕回调
+      if(code == 0){
+        // 1.图片预览 2.把图片路径设置到表单隐藏域提交到后台
+        $('#cover-preview').attr('src',src).css('width','100')
+        $("input[name='cover']").val(src)
+      }
+    }
+    ,error: function(){
+      //请求异常回调
+    }
+  });
   
   //监听提交
   // lay-filter="formDemo"
@@ -110,7 +137,6 @@ layui.use(['element','form','layer'], function(){
       
       let optionStr = `<option value=""></option>`;
       res.forEach(v=>{
-        console.log(v)
         optionStr += `<option value="${v.cat_id}">${v.name}</option>`
       })
       // 赋值给下拉框select

@@ -1,4 +1,5 @@
 // 文章控制器
+const fs = require('fs');
 let ArticleController = {}
 
 // 导入模拟（mock）的假数据
@@ -63,9 +64,9 @@ ArticleController.artAdd = (req,res)=>{
 
 // 提交数据入库
 ArticleController.postArt = async (req,res)=>{
-    let {title,cat_id,status,content} = req.body;
-    let sql = `insert into article(title,content,cat_id,status)
-                values('${title}','${content}',${cat_id},${status})
+    let {title,cat_id,status,content,cover} = req.body;
+    let sql = `insert into article(title,content,cat_id,status,cover,publish_date)
+                values('${title}','${content}',${cat_id},${status},'${cover}',now())
                 `;
     let result = await model(sql)
     if(result.affectedRows){
@@ -74,6 +75,38 @@ ArticleController.postArt = async (req,res)=>{
         res.json(addfail)
     }
 
+}
+
+// 上传图片的接口
+ArticleController.upload = (req,res)=>{
+   
+    if(req.file){
+        // 进行文件的重命名即可 fs.rename
+        let {originalname,destination,filename} = req.file;
+        let dotIndex = originalname.lastIndexOf('.');
+        let ext = originalname.substring(dotIndex);
+        let oldPath = `${destination}${filename}`;
+        let newPath = `${destination}${filename}${ext}`;
+        fs.rename(oldPath,newPath,err=>{
+            if(err){ throw err; }
+            res.json({code:0,message:'上传文件成功',src:newPath})
+        })
+    }else{
+        res.json({code:1, message:'上传文件失败'})
+    }
+    
+}
+
+// 修改文章的状态
+ArticleController.updStatus = async (req,res)=>{
+    let {art_id,status} = req.body;
+    let sql = `update article set status = ${status} where art_id = ${art_id}`;
+    let result = await model(sql);
+    if(result.affectedRows){
+        res.json(updsucc)
+    }else{
+        res.json(updfail)
+    }
 }
 
 // 暴露模块

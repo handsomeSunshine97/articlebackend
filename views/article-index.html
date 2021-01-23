@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   {{ include './common/linkcss.html' }}
+  <link rel="stylesheet" href="/public/css/lightbox.css">
 </head>
 
 <body class="layui-layout-body">
@@ -46,6 +47,7 @@
 
   </div>
   {{ include './common/scriptjs.html' }}
+  <script src="/public/js/lightbox-plus-jquery.min.js"></script>
   <script>
     // NProgress.set(0.4);// 默认设置40% NProgress.set(0) 等价与 NProgress.start()
     // let interval = setInterval(function(){
@@ -118,8 +120,14 @@
             sort: true
           }, {
             field: 'cover',
-            title: '图片',
-            width: 100
+            title: '封面',
+            width: 100,
+            templet({cover}){
+              let imgStr = `<a class="example-image-link" href="${cover}" data-lightbox="example-1" data-title="我帅木">
+                        <img class="example-image" src="${cover}" alt="暂无图片" />
+                    </a>`;
+              return imgStr;
+            }
           }, {
             field: 'status',
             title: '状态',
@@ -128,8 +136,8 @@
               // 映射关系 或 new Map也行
               let statusMap = {
                 "0": '<span class="layui-badge layui-bg-blue">未发布</span>',
-                "1": "<span class='layui-badge layui-bg-green'>已发布</span>",
-                "2": "审核中"
+                "1": "<span class='layui-badge layui-bg-green'>已发布(通过)</span>",
+                "2": "<span class='layui-badge' style='background:red'>不通过</span>"
               }
               return statusMap[item.status]
             }
@@ -180,7 +188,7 @@
       });
 
 
-      //监听删除、编辑事件
+      //监听删除、编辑、审核事件
       table.on('tool(test)', function (obj) {
         let {
           data,
@@ -188,11 +196,14 @@
         } = obj;
         let {art_id} = data;
         switch (event) {
-          case "del":
+          case "del": // 删除
             del(art_id)
             break;
-          case "edit":
+          case "edit": // 编辑
             edit(art_id)
+            break;
+          case "verify": // 待审核
+            verify(art_id)
             break;
 
         }
@@ -229,6 +240,35 @@
         // 需要把id携带过去
         location.href = `/artedit?art_id=${art_id}`
       }
+
+      // 审核文章 发送ajax请求，修改文章的状态
+      function verify(art_id){
+        //询问框
+      layer.confirm('是否通过审核', {
+          btn: ['通过','不通过'] //按钮
+        }, function(){
+          // 通过 => status 1
+          updArtStatus(art_id,1)
+        }, function(){
+          // 不通过 => status  2
+          updArtStatus(art_id,2)
+         
+        });
+      }
+
+
+
+      // 更新文章状态
+      function updArtStatus(art_id,status){
+        $.post('/updstatus',{art_id,status},({errcode,message})=>{
+          if(errcode == 0){
+            tableUI.reload(); // 只是重载表格（局部刷新）
+          }
+          layer.msg(message)
+        },'json')
+      }
+
+      
 
       // 跳转到文章添加页面
       $("#add").on('click',()=>{
