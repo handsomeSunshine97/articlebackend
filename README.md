@@ -41,3 +41,27 @@
 
 - 1.先实现数据在表单中的回显，要获取到文章的id去发起请求获取数据
 - 2.实现update入库 
+
+
+
+## 集成富文本编辑器wangEditor
+
+- [官网](https://www.wangeditor.com/)
+- [文档](https://doc.wangeditor.com/)
+
+- 初始化
+```html
+<body>
+    <div id="div1"></div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
+<script type="text/javascript">
+    const E = window.wangEditor
+    const editor = new E('#div1')
+    editor.config.uploadImgShowBase64 = true; // 可以实现手动上传图片(转换成base64格式)
+    // 或者 const editor = new E( document.getElementById('div1') )
+    editor.create()
+</script>
+```
+- [获取和设置内容api](https://doc.wangeditor.com/pages/02-%E5%86%85%E5%AE%B9%E5%A4%84%E7%90%86/03-%E8%8E%B7%E5%8F%96html.html)
+

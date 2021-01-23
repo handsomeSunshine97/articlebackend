@@ -93,10 +93,10 @@ ArticleController.upload = (req,res)=>{
         let newPath = `${destination}${filename}${ext}`;
         fs.rename(oldPath,newPath,err=>{
             if(err){ throw err; }
-            res.json({message:'上传成功',code: 0,data:{src:newPath}})
+            res.json({message:'上传成功',code: 0,src:newPath})
         })
     }else{
-        res.json({message:'上传失败',code: 1,data:null})
+        res.json({message:'上传失败',code: 1,src:''})
     }
 }
 

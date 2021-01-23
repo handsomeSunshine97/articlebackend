@@ -107,7 +107,8 @@
           }, {
             field: 'content',
             title: '内容',
-            width: 120
+            width: 120,
+            hide:true
           }, {
             field: 'name',
             title: '所属分类',
@@ -156,11 +157,11 @@
             title: '操作',
             // toolbar: '#barDemo',1
             templet({status}){
-              let temStr = `<a class="layui-btn layui-btn-xs" lay-event="show">查看内容-${status}</a>`;
+              let temStr = `<a class="layui-btn layui-btn-xs" lay-event="show">查看内容</a>`;
               // 当前状态是0，说明是未发布，我们可以对其进行审核
               switch(status){
                 case 0: // 未发布 
-                  temStr += `<a class="layui-btn layui-btn-xs layui-bg-orange" lay-event="verify">待审核-${status}</a>`
+                  temStr += `<a class="layui-btn layui-btn-xs layui-bg-orange" lay-event="verify">待审核</a>`
                   break;
                 default:
                   break;
@@ -188,13 +189,14 @@
       });
 
 
-      //监听删除、编辑、审核事件
+      //监听删除、编辑、审核、查看内容事件
       table.on('tool(test)', function (obj) {
         let {
           data,
           event
         } = obj;
-        let {art_id} = data;
+        // data就是当前的一行记录
+        let {art_id,title,content} = data;
         switch (event) {
           case "del": // 删除
             del(art_id)
@@ -205,12 +207,25 @@
           case "verify": // 待审核
             verify(art_id)
             break;
+          case "show": // 待审核
+            showContent(title,content)
+            break;
 
         }
 
 
 
       });
+      //弹框显示文章内容
+      function showContent(title,content){
+        layer.open({
+            title:title,
+            type: 1,
+            skin: 'layui-layer-rim', //加上边框
+            area: ['1100px', '640px'], //宽高
+            content: "<div style='padding:10px'>" + content + "</div>"
+          });
+      }
 
       // 删除文章
       function del(art_id) {
